@@ -20,7 +20,11 @@ export default async function handler(req, res) {
     // Get API key from environment variable
     const apiKey = process.env.CLAUDE_API_KEY;
     if (!apiKey) {
-      throw new Error('Claude API key not configured');
+      console.error('CLAUDE_API_KEY environment variable is not set');
+      return res.status(500).json({ 
+        error: 'Claude API key not configured',
+        details: 'Please set CLAUDE_API_KEY in Vercel environment variables'
+      });
     }
 
     // Call Claude API
@@ -40,16 +44,29 @@ export default async function handler(req, res) {
       })
     });
 
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Claude API error');
+      console.error('Claude API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        response: responseText
+      });
+      return res.status(response.status).json({ 
+        error: 'Claude API error',
+        status: response.status,
+        message: responseText
+      });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     res.status(200).json({ content: data.content[0].text });
 
   } catch (error) {
-    console.error('Claude API error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Claude API handler error:', error);
+    res.status(500).json({ 
+      error: error.message,
+      type: error.constructor.name
+    });
   }
 }
