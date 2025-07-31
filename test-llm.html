@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Test - Salem Career Quiz</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #5e3391;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #4a2a73; }
+        #response-output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 LLM Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Configuration Status</h2>
+        <div id="config-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. API Endpoint Test</h2>
+        <button onclick="testEndpoint()">Test Vercel Endpoint</button>
+        <div id="endpoint-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. LLM Service Test</h2>
+        <button onclick="testLLMService()">Initialize LLM Service</button>
+        <div id="service-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Dynamic Question Generation</h2>
+        <button onclick="testDynamicQuestion()">Generate Dynamic Question</button>
+        <div id="question-status"></div>
+        <div id="response-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Response Analysis Test</h2>
+        <input type="text" id="test-response" placeholder="Enter a test response" style="width: 100%; padding: 10px; margin: 10px 0;">
+        <button onclick="testAnalysis()">Analyze Response</button>
+        <div id="analysis-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Network Monitor</h2>
+        <p>Open DevTools Network tab to see API calls to <code>/api/claude</code></p>
+        <div id="network-log"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="llm-service.js"></script>
+    <script>
+        let llmService;
+        let networkLog = [];
+
+        // Override fetch to log network calls
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const url = args[0];
+            if (url.includes('claude')) {
+                const logEntry = {
+                    url: url,
+                    timestamp: new Date().toISOString(),
+                    method: args[1]?.method || 'GET'
+                };
+                networkLog.push(logEntry);
+                updateNetworkLog();
+            }
+            return originalFetch.apply(this, args);
+        };
+
+        function updateNetworkLog() {
+            const logDiv = document.getElementById('network-log');
+            logDiv.innerHTML = '<h3>Recent API Calls:</h3>';
+            networkLog.slice(-5).reverse().forEach(entry => {
+                logDiv.innerHTML += `<div class="status info">${entry.timestamp} - ${entry.method} ${entry.url}</div>`;
+            });
+        }
+
+        // Test 1: Check configuration
+        function checkConfig() {
+            const status = document.getElementById('config-status');
+            let html = '';
+            
+            if (window.quizConfig) {
+                html += '<div class="status success">✅ Configuration loaded</div>';
+                html += '<div class="status info">Claude API Key: ' + 
+                    (window.quizConfig.claude.apiKey ? window.quizConfig.claude.apiKey : 'Not configured') + '</div>';
+                html += '<div class="status info">Model: ' + window.quizConfig.claude.model + '</div>';
+                
+                // Check features
+                html += '<h3>Feature Flags:</h3>';
+                Object.entries(window.quizConfig.features).forEach(([feature, enabled]) => {
+                    html += `<div class="status ${enabled ? 'success' : 'warning'}">
+                        ${enabled ? '✅' : '❌'} ${feature}: ${enabled}
+                    </div>`;
+                });
+            } else {
+                html += '<div class="status error">❌ Configuration not loaded</div>';
+            }
+            
+            status.innerHTML = html;
+        }
+
+        // Test 2: Test Vercel endpoint
+        async function testEndpoint() {
+            const status = document.getElementById('endpoint-status');
+            status.innerHTML = '<div class="status info">Testing endpoint...</div>';
+            
+            try {
+                const response = await fetch('/api/claude', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [{ role: 'user', content: 'Hello, this is a test' }],
+                        system: 'You are a helpful assistant. Respond with: "LLM endpoint working!"',
+                        temperature: 0.1,
+                        max_tokens: 50
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = `<div class="status success">✅ Endpoint working! Response: ${data.content}</div>`;
+                } else {
+                    const error = await response.text();
+                    status.innerHTML = `<div class="status error">❌ Endpoint error: ${response.status} - ${error}</div>`;
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 3: Initialize LLM Service
+        async function testLLMService() {
+            const status = document.getElementById('service-status');
+            status.innerHTML = '<div class="status info">Initializing LLM service...</div>';
+            
+            try {
+                llmService = new LLMService(window.quizConfig.claude.apiKey);
+                await llmService.initializeConversation();
+                status.innerHTML = '<div class="status success">✅ LLM Service initialized successfully</div>';
+                status.innerHTML += `<div class="status info">API URL: ${llmService.apiUrl}</div>`;
+                status.innerHTML += `<div class="status info">Conversation history: ${llmService.conversationHistory.length} messages</div>`;
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Failed to initialize: ${error.message}</div>`;
+            }
+        }
+
+        // Test 4: Generate dynamic question
+        async function testDynamicQuestion() {
+            const status = document.getElementById('question-status');
+            const output = document.getElementById('response-output');
+            
+            if (!llmService) {
+                status.innerHTML = '<div class="status error">❌ Please initialize LLM service first</div>';
+                return;
+            }
+            
+            status.innerHTML = '<div class="status info">Generating dynamic question...</div>';
+            
+            try {
+                const userProfile = {
+                    name: 'Test User',
+                    currentRole: 'Marketing Coordinator',
+                    experience: '3-5 years',
+                    goals: ['career advancement', 'leadership skills']
+                };
+                
+                const result = await llmService.generateDynamicQuestion(
+                    userProfile,
+                    ['q1', 'q2', 'q3'],
+                    ['education preferences', 'time commitment', 'budget']
+                );
+                
+                status.innerHTML = '<div class="status success">✅ Dynamic question generated!</div>';
+                output.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Generation failed: ${error.message}</div>`;
+                output.textContent = error.stack;
+            }
+        }
+
+        // Test 5: Analyze response
+        async function testAnalysis() {
+            const status = document.getElementById('analysis-status');
+            const testResponse = document.getElementById('test-response').value;
+            
+            if (!llmService) {
+                status.innerHTML = '<div class="status error">❌ Please initialize LLM service first</div>';
+                return;
+            }
+            
+            if (!testResponse) {
+                status.innerHTML = '<div class="status warning">⚠️ Please enter a test response</div>';
+                return;
+            }
+            
+            status.innerHTML = '<div class="status info">Analyzing response...</div>';
+            
+            try {
+                const analysis = await llmService.analyzeTextResponse(
+                    "What's your biggest career frustration?",
+                    testResponse,
+                    { currentRole: 'Test Role' }
+                );
+                
+                status.innerHTML = '<div class="status success">✅ Analysis complete!</div>';
+                status.innerHTML += `<pre>${JSON.stringify(analysis, null, 2)}</pre>`;
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Analysis failed: ${error.message}</div>`;
+            }
+        }
+
+        // Run config check on load
+        window.onload = function() {
+            checkConfig();
+            console.log('LLM Test Page Loaded');
+            console.log('Configuration:', window.quizConfig);
+            console.log('To test LLM features:');
+            console.log('1. Click "Test Vercel Endpoint" to verify API is accessible');
+            console.log('2. Click "Initialize LLM Service" to set up the service');
+            console.log('3. Test dynamic question generation and response analysis');
+        };
+    </script>
+</body>
+</html>

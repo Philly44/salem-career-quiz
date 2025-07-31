@@ -1005,6 +1005,10 @@
             
             <!-- Chat Messages -->
             <div class="chat-messages" id="chatMessages">
+                <!-- LLM Status Indicator -->
+                <div id="llm-status" style="position: absolute; top: 10px; right: 10px; font-size: 12px; color: #666; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <span id="llm-indicator">🤖 AI: <span id="llm-state">Checking...</span></span>
+                </div>
                 <!-- Messages will be dynamically added here -->
             </div>
             
@@ -1484,16 +1488,63 @@
             appState.userName = urlParams.get('name') || '';
             appState.quizStartTime = new Date();
             
-            // Initialize LLM service if API key is configured
-            if (window.quizConfig && window.quizConfig.claude.apiKey && window.quizConfig.claude.apiKey.startsWith('sk-ant-')) {
-                try {
-                    appState.llmService = new LLMService(window.quizConfig.claude.apiKey);
-                    await appState.llmService.initializeConversation();
-                    console.log('✅ Claude LLM service initialized');
-                } catch (error) {
-                    console.error('Failed to initialize Claude service:', error);
-                    console.log('Falling back to static quiz');
+            // Update LLM status indicator (make it globally accessible)
+            window.updateLLMStatus = (status, color = '#666') => {
+                const llmState = document.getElementById('llm-state');
+                const llmStatus = document.getElementById('llm-status');
+                if (llmState && llmStatus) {
+                    llmState.textContent = status;
+                    llmStatus.style.color = color;
                 }
+            };
+
+            // Initialize LLM service
+            try {
+                // Check if we're on Vercel (production)
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '';
+                
+                if (isProduction) {
+                    updateLLMStatus('Connecting...', '#1a759f');
+                    
+                    // Initialize with server-side configuration
+                    appState.llmService = new LLMService('configured-on-server');
+                    await appState.llmService.initializeConversation();
+                    
+                    // Test the connection
+                    const testResponse = await fetch('/api/claude', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            messages: [{ role: 'user', content: 'ping' }],
+                            system: 'Respond with just "pong"',
+                            temperature: 0.1,
+                            max_tokens: 10
+                        })
+                    });
+                    
+                    if (testResponse.ok) {
+                        console.log('✅ Claude LLM service initialized and connected');
+                        console.log('📊 LLM Features Status:');
+                        console.log('   - Dynamic Questions:', window.quizConfig.features.dynamicQuestions ? '✅' : '❌');
+                        console.log('   - Intelligent Follow-ups:', window.quizConfig.features.intelligentFollowups ? '✅' : '❌');
+                        console.log('   - NLP Analysis:', window.quizConfig.features.nlpAnalysis ? '✅' : '❌');
+                        console.log('   - AI Blueprints:', window.quizConfig.features.aiBlueprints ? '✅' : '❌');
+                        console.log('🔗 API Endpoint:', appState.llmService.apiUrl);
+                        updateLLMStatus('Active ✅', '#52b69a');
+                        appState.llmActive = true;
+                        appState.apiCallCount = 1; // Count the ping test
+                    } else {
+                        throw new Error('API test failed');
+                    }
+                } else {
+                    updateLLMStatus('Local Mode', '#f39c12');
+                    console.log('Running locally - LLM features disabled');
+                }
+            } catch (error) {
+                console.error('Failed to initialize Claude service:', error);
+                updateLLMStatus('Offline ❌', '#e74c3c');
+                console.log('Falling back to static quiz');
+                appState.llmActive = false;
             }
             
             // Start with first question
@@ -1971,12 +2022,18 @@
             } else if (appState.llmService && window.quizConfig.features.intelligentFollowups) {
                 // Generate dynamic follow-up for questions without static follow-ups
                 try {
+                    // Update status to show API activity
+                    updateLLMStatus('Thinking... 🤔', '#168aad');
+                    
                     appState.apiCallCount++;
                     const dynamicFollowup = await appState.llmService.generateFollowUpQuestion(
                         question.message,
                         option,
                         appState.conversationContext
                     );
+                    
+                    // Update status back to active
+                    updateLLMStatus(`Active ✅ (${appState.apiCallCount} calls)`, '#52b69a');
                     
                     if (dynamicFollowup) {
                         setTimeout(() => {
@@ -2019,12 +2076,18 @@
             if (appState.llmService && window.quizConfig.features.nlpAnalysis && 
                 (question.id === 'q15_ideal_role' || question.id === 'q25_final_thoughts')) {
                 try {
+                    // Update status to show API activity
+                    updateLLMStatus('Analyzing... 📝', '#168aad');
+                    
                     appState.apiCallCount++;
                     const analysis = await appState.llmService.analyzeTextResponse(
                         question.message,
                         text,
                         appState.conversationContext
                     );
+                    
+                    // Update status back to active
+                    updateLLMStatus(`Active ✅ (${appState.apiCallCount} calls)`, '#52b69a');
                     
                     // Store analysis for blueprint generation
                     appState.conversationContext[question.id] = analysis;
