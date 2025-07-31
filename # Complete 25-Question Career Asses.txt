@@ -1,0 +1,383 @@
+# Complete 25-Question Career Assessment Quiz for Salem University
+
+## Implementation Instructions
+This is the complete question set for the "Email Quiz" project in Cursor. Each question is designed for 15-minute completion with strategic flow optimization and Salem University branding.
+
+## Question Structure Format
+```
+Question [Number]: [Question Text]
+Type: [multiple-choice | text-input | scale | checkbox]
+Time Estimate: [30-60 seconds]
+Purpose: [Strategic reason for assessment]
+Logic: [Skip conditions or follow-up triggers]
+```
+
+---
+
+## SECTION 1: EDUCATIONAL FOUNDATION DISCOVERY (Questions 1-8)
+*Critical for determining appropriate program level and educational background*
+
+**Question 1: What is your highest level of education completed?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Determines program eligibility (associate, bachelor's, master's, doctoral)
+- Options:
+  - High School Diploma or GED
+  - Some College (no degree)
+  - Associate Degree
+  - Bachelor's Degree
+  - Master's Degree
+  - Doctoral Degree
+- Logic: Drives all subsequent program recommendations
+
+**Question 2: What was your field of study for your highest degree?**
+- Type: multiple-choice with "Other" text input
+- Time Estimate: 45 seconds
+- Purpose: Identifies transferable knowledge and career alignment
+- Options:
+  - Business/Management
+  - Healthcare/Nursing
+  - Education/Teaching
+  - Criminal Justice/Law Enforcement
+  - Technology/Computer Science
+  - Liberal Arts/General Studies
+  - Science/Engineering
+  - Other (please specify)
+- Logic: Influences specialization recommendations
+
+**Question 3: When did you complete (or expect to complete) your most recent degree?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Determines currency of education and career stage
+- Options:
+  - Currently enrolled
+  - Within the last 2 years
+  - 2-5 years ago
+  - 5-10 years ago
+  - More than 10 years ago
+- Logic: Affects timeline and refresher course recommendations
+
+**Question 4: How would you describe your academic performance?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Builds confidence and addresses potential concerns
+- Options:
+  - Excellent (mostly A's)
+  - Good (mostly B's)
+  - Average (mostly C's)
+  - It was challenging for me
+  - I was a different person then - ready to excel now
+- Logic: Influences support service recommendations
+
+**Question 5: What was your favorite aspect of your educational experience?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Identifies learning preferences and motivators
+- Options:
+  - Hands-on projects and real-world applications
+  - Research and analytical thinking
+  - Group discussions and collaboration
+  - Independent study and self-direction
+  - Connecting theory to practice
+  - Building relationships with classmates and faculty
+- Logic: Informs learning format recommendations
+
+**Question 6: If you could add one skill or credential to your background, what would have the biggest impact on your career?**
+- Type: multiple-choice
+- Time Estimate: 60 seconds
+- Purpose: Reveals career advancement priorities
+- Options:
+  - Advanced degree in my field
+  - Leadership and management training
+  - Professional certifications
+  - Technology and digital skills
+  - Communication and presentation abilities
+  - Industry-specific expertise
+- Logic: Highlights program benefits to emphasize
+
+**Question 7: Have you taken any professional development courses, certifications, or training in the past 3 years?**
+- Type: multiple-choice with text input
+- Time Estimate: 45 seconds
+- Purpose: Shows commitment to growth and identifies gaps
+- Options:
+  - Yes, multiple courses/certifications (please describe)
+  - Yes, one significant program (please describe)
+  - Some informal training or workshops
+  - No, but I've been planning to
+  - No, this would be my first step back into education
+- Logic: Influences urgency and support messaging
+
+**Question 8: What's your biggest concern about returning to school or advancing your education?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Identifies objections to address in assessment
+- Options:
+  - Time management with work and family
+  - Academic confidence after time away
+  - Technology and online learning
+  - Financial investment and value
+  - Choosing the right program
+  - Balancing studies with current responsibilities
+- Logic: Determines which benefits and support services to highlight
+
+---
+
+## SECTION 2: PROFESSIONAL EXPERIENCE ANALYSIS (Questions 9-15)
+*Maps career journey and identifies transferable skills*
+
+**Question 9: How would you describe your current employment status?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Understanding current situation and urgency
+- Options:
+  - Employed full-time
+  - Employed part-time
+  - Self-employed/Freelancing
+  - Between jobs/Actively seeking
+  - Student
+  - Retired but considering new opportunities
+- Logic: Affects timeline and program format recommendations
+
+**Question 10: What industry do you currently work in (or most recently worked in)?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Industry alignment with Salem programs
+- Options:
+  - Healthcare/Medical
+  - Business/Finance/Consulting
+  - Education/Training
+  - Government/Public Service
+  - Technology/IT
+  - Criminal Justice/Law Enforcement
+  - Non-profit/Social Services
+  - Other (please specify)
+- Logic: Drives industry-specific program recommendations
+
+**Question 11: How many years of professional experience do you have?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Career stage and advancement potential
+- Options:
+  - Less than 2 years
+  - 2-5 years
+  - 5-10 years
+  - 10-15 years
+  - 15-20 years
+  - More than 20 years
+- Logic: Influences career advancement messaging
+
+**Question 12: Which best describes your current role level?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Leadership experience and advancement goals
+- Options:
+  - Individual contributor/Front-line role
+  - Senior specialist/Subject matter expert
+  - Team leader/Supervisor
+  - Manager/Department head
+  - Senior manager/Director
+  - Executive/C-suite
+- Logic: Determines leadership vs. technical track recommendations
+
+**Question 13: What aspects of your current work do you find most engaging?**
+- Type: checkbox (select up to 3)
+- Time Estimate: 60 seconds
+- Purpose: Career satisfaction and program alignment
+- Options:
+  - Problem-solving and analytical challenges
+  - Leading and developing team members
+  - Client/customer interaction and service
+  - Strategic planning and big-picture thinking
+  - Hands-on technical work
+  - Creative and innovative projects
+  - Training and knowledge sharing
+  - Process improvement and efficiency
+- Logic: Matches interests to program specializations
+
+**Question 14: What's your biggest frustration in your current career situation?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Pain points that education can solve
+- Options:
+  - Limited advancement opportunities
+  - Lack of recognition for my contributions
+  - Feeling stuck in routine tasks
+  - Insufficient compensation for my skills
+  - Need more credibility and credentials
+  - Want to transition to a new field
+- Logic: Positions education as solution to specific problems
+
+**Question 15: If you could wave a magic wand and be in your ideal role 3 years from now, what would you be doing?**
+- Type: text-input (short answer)
+- Time Estimate: 90 seconds
+- Purpose: Career vision and goal alignment
+- Logic: Critical for personalized program positioning
+
+---
+
+## SECTION 3: CAREER VISION AND MOTIVATION (Questions 16-21)
+*Uncovers goals, timeline, and driving factors*
+
+**Question 16: What's your primary career goal for the next 3-5 years?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Goal alignment with program outcomes
+- Options:
+  - Advance to leadership/management role
+  - Become a recognized expert in my field
+  - Transition to a new industry or career
+  - Start my own business or practice
+  - Increase my earning potential significantly
+  - Find more meaningful and fulfilling work
+- Logic: Determines which career outcomes to emphasize
+
+**Question 17: What's motivating you to consider additional education right now?**
+- Type: checkbox (select all that apply)
+- Time Estimate: 60 seconds
+- Purpose: Urgency factors and emotional drivers
+- Options:
+  - Career advancement opportunity
+  - Job market changes in my industry
+  - Personal goal I've been putting off
+  - Employer encouragement or requirement
+  - Desire for more job security
+  - Life transition (career change, empty nest, etc.)
+  - Want to set example for family/others
+- Logic: Emotional triggers for urgency messaging
+
+**Question 18: How important is it that your education directly relates to your current job versus opening new opportunities?**
+- Type: scale (1-5 slider)
+- Time Estimate: 45 seconds
+- Purpose: Career advancement vs. career change strategy
+- Scale: Current Job Focus (1) ← → New Opportunities (5)
+- Logic: Influences program positioning and career trajectory
+
+**Question 19: When would you ideally like to complete an educational program?**
+- Type: multiple-choice
+- Time Estimate: 30 seconds
+- Purpose: Timeline urgency and program format
+- Options:
+  - As quickly as possible (under 1 year)
+  - 1-2 years
+  - 2-3 years
+  - 3-4 years
+  - I'm flexible on timing
+- Logic: Matches timeline expectations with program options
+
+**Question 20: What role do you see yourself in 10 years from now?**
+- Type: multiple-choice
+- Time Estimate: 60 seconds
+- Purpose: Long-term vision and career trajectory
+- Options:
+  - Senior executive or business owner
+  - Recognized expert/thought leader in my field
+  - Educator/trainer/mentor to others
+  - Consultant or independent professional
+  - Community leader making social impact
+  - Still exploring - want to keep options open
+- Logic: Positions education as stepping stone to vision
+
+**Question 21: If you had to choose one thing that would make you feel most successful in your career, what would it be?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Core motivation and success definition
+- Options:
+  - Recognition as a leader in my field
+  - Financial security and independence
+  - Making a positive impact on others
+  - Intellectual challenge and continuous learning
+  - Work-life balance and flexibility
+  - Building something lasting and meaningful
+- Logic: Core emotional driver for program benefits
+
+---
+
+## SECTION 4: DECISION CRITERIA AND PROCESS (Questions 22-24)
+*Understanding decision-making approach and concerns*
+
+**Question 22: When making important career decisions, what factors matter most to you?**
+- Type: checkbox (select up to 3)
+- Time Estimate: 60 seconds
+- Purpose: Decision-making priorities
+- Options:
+  - Reputation and credibility of the institution
+  - Flexibility to balance with current responsibilities
+  - Support and resources available to students
+  - Career services and job placement assistance
+  - Cost and return on investment
+  - Program format (online, hybrid, in-person)
+  - Faculty expertise and industry connections
+  - Accelerated timeline to completion
+- Logic: Highlights Salem's strongest value propositions
+
+**Question 23: Who else would be involved in your decision about pursuing additional education?**
+- Type: multiple-choice
+- Time Estimate: 45 seconds
+- Purpose: Decision-making process and influencers
+- Options:
+  - This is entirely my decision
+  - My spouse/partner
+  - My employer or manager
+  - Family members
+  - Professional mentor or advisor
+  - Financial advisor
+- Logic: Identifies who needs to be convinced/informed
+
+**Question 24: What would need to happen for you to feel confident moving forward with an educational program?**
+- Type: checkbox (select all that apply)
+- Time Estimate: 60 seconds
+- Purpose: Final objections and requirements
+- Options:
+  - Clear understanding of time commitment
+  - Confidence in my ability to succeed
+  - Proof of career advancement outcomes
+  - Financial plan that works for my situation
+  - Support from employer/family
+  - Detailed program curriculum and requirements
+  - Opportunity to speak with current students/graduates
+- Logic: Final objection handling in assessment
+
+---
+
+## SECTION 5: LEARNING PREFERENCES AND LOGISTICS (Question 25)
+*Practical considerations for program fit*
+
+**Question 25: To wrap up, what's the most important thing you'd want us to know about your situation as we prepare your personalized career assessment?**
+- Type: text-input (longer response)
+- Time Estimate: 90 seconds
+- Purpose: Final personalization and unique circumstances
+- Logic: Captures anything missed and adds personal touch
+
+---
+
+## COMPLETION FLOW
+
+**Progress Milestones:**
+- **25% Complete (Question 6):** "Great start! Your educational background is clear..."
+- **50% Complete (Question 13):** "Halfway there! Your career experience is impressive..."
+- **75% Complete (Question 19):** "Almost finished! Your goals are taking shape..."
+- **100% Complete:** "Assessment complete! Your personalized roadmap is being generated..."
+
+**Smart Logic Rules:**
+- If "High School" in Q1 → Emphasize associate/bachelor programs
+- If "Master's Degree" in Q1 → Focus on doctoral programs or certificates
+- If "Currently enrolled" in Q3 → Skip certain education questions
+- If "Between jobs" in Q9 → Emphasize quick start programs
+- If "20+ years experience" in Q11 → Focus on leadership programs
+
+**Time Optimization:**
+- **Target:** 15 minutes total
+- **Average per question:** 35 seconds
+- **Buffer time:** 30 seconds for transitions
+- **Actual completion:** 12-18 minutes
+
+## Integration with Assessment Generator
+
+Each answer feeds directly into the career assessment prompt variables:
+- **Educational Background:** Questions 1-8
+- **Professional Experience:** Questions 9-15  
+- **Career Goals:** Questions 16-21
+- **Decision Factors:** Questions 22-24
+- **Personal Context:** Question 25
+
+This question set provides all data needed to generate compelling, personalized career assessments that drive enrollment decisions.

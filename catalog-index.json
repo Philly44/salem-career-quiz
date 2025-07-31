@@ -1,0 +1,22 @@
+{
+  "search_patterns": {
+    "undergraduate_programs": "Bachelor of Science|B.S.|Bachelor's|Associate",
+    "graduate_programs": "Master of|M.A.|M.S.|MBA|DBA|Doctor",
+    "business_programs": "Business Administration|Accounting|Finance|Marketing|Management",
+    "technology_programs": "Computer Science|Information Technology|Cybersecurity",
+    "education_programs": "Education|Teaching|Educational Leadership",
+    "healthcare_programs": "Nursing|Health|Medical",
+    "criminal_justice": "Criminal Justice|Law Enforcement"
+  },
+  "program_sections": {
+    "undergraduate_start": 421,
+    "graduate_start": 1317,
+    "course_descriptions": "typically after program listings"
+  },
+  "key_features": {
+    "heritage": "130 years since 1888",
+    "graduates": "over 20,000 graduates",
+    "support": "weekly free tutoring",
+    "accreditation": "HLC accredited since 1963"
+  }
+}

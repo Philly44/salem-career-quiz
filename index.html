@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Salem University Career Assessment</title>
+    
+    <!-- Import the color palette -->
+    <link rel="stylesheet" href="colors.css">
+    
+    <style>
+        /* CSS Variables from colors.css */
+        :root {
+            --mindaro: #d9ed92ff;
+            --light-green: #b5e48cff;
+            --light-green-2: #99d98cff;
+            --emerald: #76c893ff;
+            --keppel: #52b69aff;
+            --verdigris: #34a0a4ff;
+            --bondi-blue: #168aadff;
+            --cerulean: #1a759fff;
+            --lapis-lazuli: #1e6091ff;
+            --indigo-dye: #184e77ff;
+            
+            /* Semantic color mapping */
+            --color-primary: var(--cerulean);
+            --color-secondary: var(--emerald);
+            --color-accent: var(--verdigris);
+            --color-background: #f8faf5;
+            --color-surface: #ffffff;
+            --color-text: #2d3436;
+            --color-text-secondary: #636e72;
+            --color-success: var(--emerald);
+            --color-warning: var(--mindaro);
+            --color-info: var(--bondi-blue);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Mobile-first container */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Chat Interface Styles */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            background: var(--color-surface);
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--lapis-lazuli) 0%, var(--cerulean) 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .header-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .header-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: hidden;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
+            background: var(--color-background);
+            position: relative;
+        }
+        
+        /* Single-screen message management */
+        .message-fadeout {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+        }
+        
+        .message-fadein {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .message.bot .message-avatar {
+            background: var(--emerald);
+            color: white;
+        }
+        
+        .message.user .message-avatar {
+            background: var(--verdigris);
+            color: white;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .message.bot .message-bubble {
+            background: white;
+            color: var(--color-text);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, var(--keppel) 0%, var(--verdigris) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        /* Quick Reply Buttons */
+        .quick-replies {
+            padding: 12px 20px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            min-height: 60px;
+            align-items: center;
+        }
+        
+        /* Enhanced Quick Reply Cards */
+        .quick-replies {
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(217,237,146,0.05) 100%);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            min-height: 80px;
+        }
+        
+        .quick-replies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .quick-reply-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-text);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.4s ease;
+        }
+        
+        .quick-reply-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--mindaro) 0%, var(--emerald) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .quick-reply-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-color: var(--emerald);
+        }
+        
+        .quick-reply-card:hover::before {
+            opacity: 0.1;
+        }
+        
+        .quick-reply-card span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animation for cards */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Legacy button style for compatibility */
+        .quick-reply-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--emerald);
+            background: white;
+            color: var(--color-primary);
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quick-reply-btn:hover, .quick-reply-btn:active {
+            background: var(--emerald);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        /* Input Area */
+        .chat-input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--light-green);
+            border-radius: 24px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            min-height: 48px;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--emerald);
+        }
+        
+        .send-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--emerald) 0%, var(--keppel) 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 20px;
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 16px;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--light-green-2);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        /* Enhanced Progress System */
+        .progress-container {
+            padding: 24px 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(217,237,146,0.08) 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .progress-sections {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+        
+        .progress-section {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 14px;
+        }
+        
+        .section-dot.active {
+            background: var(--emerald);
+            border-color: var(--emerald);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(118,200,147,0.4);
+        }
+        
+        .section-dot.completed {
+            background: var(--verdigris);
+            border-color: var(--verdigris);
+            color: white;
+        }
+        
+        .section-dot.completed::after {
+            content: '✓';
+            position: absolute;
+            font-size: 20px;
+        }
+        
+        .section-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .section-label.active {
+            color: var(--emerald);
+            font-weight: 600;
+        }
+        
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--verdigris) 0%, var(--emerald) 100%);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 12px;
+        }
+        
+        .progress-percentage {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--emerald);
+            margin-right: 8px;
+        }
+        
+        .time-estimate {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Career Blueprint View */
+        .blueprint-container {
+            display: none;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .blueprint-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--mindaro) 0%, var(--light-green) 100%);
+            border-radius: 16px;
+        }
+        
+        .blueprint-header h2 {
+            font-size: 24px;
+            color: var(--indigo-dye);
+            margin-bottom: 8px;
+        }
+        
+        .career-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--verdigris);
+            transition: transform 0.2s ease;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(4px);
+        }
+        
+        .timeline-year {
+            font-size: 14px;
+            color: var(--verdigris);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-role {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--indigo-dye);
+            margin-bottom: 8px;
+        }
+        
+        .timeline-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .skill-badge {
+            padding: 4px 12px;
+            background: var(--mindaro);
+            color: var(--indigo-dye);
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .cta-section {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .apply-button {
+            background: linear-gradient(135deg, var(--cerulean) 0%, var(--bondi-blue) 100%);
+            color: white;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            min-height: 56px;
+        }
+        
+        .apply-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 117, 159, 0.3);
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Reward animations */
+        .reward-badge {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 20px;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: rewardPop 0.6s ease forwards;
+        }
+        
+        @keyframes rewardPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
+            }
+        }
+        
+        /* Micro-interactions */
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--emerald);
+            border-radius: 50%;
+            margin: 0 4px;
+            animation: pulse 1.5s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Confetti animation for milestones */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--emerald);
+            position: absolute;
+            animation: confetti-fall 3s ease-out;
+            z-index: 1000;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Celebration message */
+        .celebration-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 1001;
+            animation: celebrationPop 0.5s ease;
+        }
+        
+        @keyframes celebrationPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            80% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Checkbox styles */
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .checkbox-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 56px;
+        }
+        
+        .checkbox-option:hover {
+            border-color: var(--emerald);
+            transform: translateX(4px);
+        }
+        
+        .checkbox-option.selected {
+            background: var(--mindaro);
+            border-color: var(--emerald);
+        }
+        
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-submit-btn {
+            background: linear-gradient(135deg, var(--cerulean) 0%, var(--bondi-blue) 100%);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            min-height: 56px;
+        }
+        
+        .checkbox-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 117, 159, 0.3);
+        }
+        
+        .checkbox-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Scale/Slider styles */
+        .scale-container {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            margin-top: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .scale-slider {
+            width: 100%;
+            margin: 40px 0 30px 0;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 12px;
+            background: linear-gradient(to right, var(--mindaro) 0%, var(--emerald) 50%, var(--cerulean) 100%);
+            border-radius: 6px;
+            outline: none;
+            opacity: 0.9;
+        }
+        
+        .scale-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 3px solid var(--cerulean);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .scale-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .scale-slider::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 3px solid var(--cerulean);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .scale-slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--indigo-dye);
+            padding: 0 5px;
+        }
+        
+        .scale-value {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--cerulean);
+            margin: 20px 0 30px 0;
+            line-height: 1;
+        }
+        
+        .scale-submit-btn {
+            background: linear-gradient(135deg, var(--cerulean) 0%, var(--bondi-blue) 100%);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+            width: 100%;
+            transition: all 0.3s ease;
+            min-height: 56px;
+        }
+        
+        .scale-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 117, 159, 0.3);
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--emerald) 100%);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .chat-header {
+                padding: 16px;
+            }
+            
+            .header-text h1 {
+                font-size: 16px;
+            }
+            
+            .message-bubble {
+                max-width: 90%;
+                font-size: 15px;
+            }
+            
+            .quick-reply-btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            
+            .timeline-item {
+                padding: 16px;
+            }
+        }
+        
+        /* Touch-friendly adjustments */
+        @media (hover: none) {
+            .quick-reply-btn:active {
+                background: var(--emerald);
+                color: white;
+            }
+            
+            .timeline-item:active {
+                transform: translateX(4px);
+            }
+        }
+        
+        /* Hide elements initially */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Chat Interface -->
+        <div id="chatInterface" class="chat-container">
+            <div class="chat-header">
+                <div class="header-content">
+                    <div class="bot-avatar">🎓</div>
+                    <div class="header-text">
+                        <h1>Salem Career Advisor</h1>
+                        <p class="status">Online & ready to help! ✨</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Progress Bar -->
+            <div class="progress-container hidden" id="progressContainer">
+                <div class="progress-sections">
+                    <div class="progress-line">
+                        <div class="progress-line-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-section" data-section="1">
+                        <div class="section-dot active" id="section1">1</div>
+                        <div class="section-label active">Education</div>
+                    </div>
+                    <div class="progress-section" data-section="2">
+                        <div class="section-dot" id="section2">2</div>
+                        <div class="section-label">Experience</div>
+                    </div>
+                    <div class="progress-section" data-section="3">
+                        <div class="section-dot" id="section3">3</div>
+                        <div class="section-label">Vision</div>
+                    </div>
+                    <div class="progress-section" data-section="4">
+                        <div class="section-dot" id="section4">4</div>
+                        <div class="section-label">Decision</div>
+                    </div>
+                    <div class="progress-section" data-section="5">
+                        <div class="section-dot" id="section5">5</div>
+                        <div class="section-label">Finish</div>
+                    </div>
+                </div>
+                <div class="progress-stats">
+                    <div>
+                        <span class="progress-percentage" id="progressPercent">0%</span>
+                        <span class="progress-current">Complete</span>
+                    </div>
+                    <span class="time-estimate" id="timeEstimate">~12 min remaining</span>
+                </div>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be dynamically added here -->
+            </div>
+            
+            <!-- Quick Replies -->
+            <div class="quick-replies hidden" id="quickReplies">
+                <!-- Quick reply buttons will be dynamically added here -->
+            </div>
+            
+            <!-- Input Area -->
+            <div class="chat-input-area hidden" id="inputArea">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Type your answer..."
+                    autocomplete="off"
+                >
+                <button class="send-button" id="sendButton">
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Career Blueprint View -->
+        <div id="blueprintView" class="blueprint-container hidden">
+            <!-- Blueprint content will be dynamically added here -->
+        </div>
+        
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <h2>Creating Your Career Blueprint...</h2>
+            <p>Analyzing your responses...</p>
+        </div>
+    </div>
+    
+    <!-- External scripts for LLM integration -->
+    <script src="config.js"></script>
+    <script src="llm-service.js"></script>
+    <script src="conversational-enhancements.js"></script>
+    
+    <!-- Embedded quiz logic -->
+    <script>
+        // Salem University Career Assessment Quiz Application
+        // Enhanced with LLM integration for dynamic, personalized experiences
+
+        // Application state
+        const appState = {
+            currentQuestion: 0,
+            responses: {},
+            isTyping: false,
+            quizStartTime: null,
+            userEmail: '',
+            userName: '',
+            milestones: {},
+            llmService: null,
+            apiCallCount: 0,
+            dynamicQuestions: [],
+            conversationContext: {}
+        };
+
+        // DOM elements
+        const elements = {
+            chatMessages: document.getElementById('chatMessages'),
+            quickReplies: document.getElementById('quickReplies'),
+            inputArea: document.getElementById('inputArea'),
+            chatInput: document.getElementById('chatInput'),
+            sendButton: document.getElementById('sendButton'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressFill: document.getElementById('progressFill'),
+            progressCurrent: document.getElementById('progressCurrent'),
+            progressPercent: document.getElementById('progressPercent'),
+            chatInterface: document.getElementById('chatInterface'),
+            blueprintView: document.getElementById('blueprintView'),
+            loadingScreen: document.getElementById('loadingScreen')
+        };
+
+        // Complete 25-Question Career Assessment
+        const quizQuestions = [
+            // Introduction
+            {
+                id: 'intro',
+                message: "Hi! 👋 I'm Salem, your personal career advisor. Think of me as your guide to discovering the perfect education path for your future! Ready to explore your possibilities? 🚀",
+                type: 'quick',
+                options: ['Yes, let\'s start! 🎉', 'Tell me more first 🤔']
+            },
+            // Section 1: Educational Foundation (Questions 1-8)
+            {
+                id: 'q1_education_level',
+                number: 1,
+                message: "Let's start with your educational journey! 🎓 What's your highest level of education completed?",
+                type: 'quick',
+                options: [
+                    'High School Diploma or GED',
+                    'Some College (no degree)',
+                    'Associate Degree',
+                    'Bachelor\'s Degree',
+                    'Master\'s Degree',
+                    'Doctoral Degree'
+                ],
+                followUp: {
+                    'High School Diploma or GED': "Starting fresh! Love the ambition! 🌱 You're about to unlock so many possibilities!",
+                    'Some College (no degree)': "Welcome back! Time to finish what you started! 💪",
+                    'Associate Degree': "Nice foundation! Ready to build higher? 🏗️",
+                    'Bachelor\'s Degree': "Bachelor's club! Time for the next level? 🎯",
+                    'Master\'s Degree': "Already a master! Going for legendary status? ⭐",
+                    'Doctoral Degree': "Wow, a doctor in the house! Always more to learn! 🚀"
+                }
+            },
+            {
+                id: 'q2_field_of_study',
+                number: 2,
+                message: "Great! Now, what was your field of study? 📚 This helps me understand your background better!",
+                type: 'quick',
+                options: [
+                    'Business/Management',
+                    'Healthcare/Nursing',
+                    'Education/Teaching',
+                    'Criminal Justice/Law Enforcement',
+                    'Technology/Computer Science',
+                    'Liberal Arts/General Studies',
+                    'Science/Engineering',
+                    'Other'
+                ],
+                dynamicMessage: function(responses) {
+                    if (responses.q1_education_level === 'Some College (no degree)') {
+                        return "What field are you studying (or did you study)? 📚 This helps me understand your interests!";
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 'q3_completion_date',
+                number: 3,
+                message: "When did you complete (or expect to complete) your most recent degree? ⏰",
+                type: 'quick',
+                options: [
+                    'Currently enrolled',
+                    'Within the last 2 years',
+                    '2-5 years ago',
+                    '5-10 years ago',
+                    'More than 10 years ago'
+                ]
+            },
+            {
+                id: 'q4_academic_performance',
+                number: 4,
+                message: "How would you describe your academic performance? 📊 (No judgment - we all have different strengths!)",
+                type: 'quick',
+                options: [
+                    'Excellent (mostly A\'s)',
+                    'Good (mostly B\'s)',
+                    'Average (mostly C\'s)',
+                    'It was challenging for me',
+                    'I was a different person then - ready to excel now!'
+                ],
+                followUp: {
+                    'Excellent (mostly A\'s)': "Academic rockstar! 🌟 That dedication will serve you well!",
+                    'Good (mostly B\'s)': "Solid performance! You know how to get results! 💪",
+                    'Average (mostly C\'s)': "Hey, C's get degrees! And experience counts for so much more! 👍",
+                    'It was challenging for me': "I appreciate your honesty! Our support system is amazing - free weekly tutoring included! 🤝",
+                    'I was a different person then - ready to excel now!': "Love that growth mindset! That's the spirit of a true champion! 🏆"
+                }
+            },
+            {
+                id: 'q5_favorite_aspect',
+                number: 5,
+                message: "What was your favorite part of your educational experience? 🌟",
+                type: 'quick',
+                options: [
+                    'Hands-on projects and real-world applications',
+                    'Research and analytical thinking',
+                    'Group discussions and collaboration',
+                    'Independent study and self-direction',
+                    'Connecting theory to practice',
+                    'Building relationships with classmates and faculty'
+                ]
+            },
+            {
+                id: 'q6_skill_to_add',
+                number: 6,
+                message: "If you could add ONE skill or credential to level up your career, what would it be? 🎮",
+                type: 'quick',
+                options: [
+                    'Advanced degree in my field',
+                    'Leadership and management training',
+                    'Professional certifications',
+                    'Technology and digital skills',
+                    'Communication and presentation abilities',
+                    'Industry-specific expertise'
+                ]
+            },
+            {
+                id: 'q7_recent_development',
+                number: 7,
+                message: "Have you taken any professional development courses or certifications recently? 📈",
+                type: 'quick',
+                options: [
+                    'Yes, multiple courses/certifications',
+                    'Yes, one significant program',
+                    'Some informal training or workshops',
+                    'No, but I\'ve been planning to',
+                    'No, this would be my first step back'
+                ]
+            },
+            {
+                id: 'q8_biggest_concern',
+                number: 8,
+                message: "Real talk - what's your biggest concern about going back to school? 🤔 (I'm here to help address it!)",
+                type: 'quick',
+                options: [
+                    'Time management with work and family',
+                    'Academic confidence after time away',
+                    'Technology and online learning',
+                    'Financial investment and value',
+                    'Choosing the right program',
+                    'Balancing studies with current responsibilities'
+                ],
+                followUp: {
+                    'Time management with work and family': "Totally get it! That's why our flexible programs are designed for busy professionals like you! ⏰",
+                    'Academic confidence after time away': "You've got this! Our free weekly tutoring and 24/7 support will boost your confidence! 💪",
+                    'Technology and online learning': "No worries! Our tech support is amazing and available 24/7! 💻",
+                    'Financial investment and value': "Smart thinking! Let me show you how our graduates see real career advancement... 📈",
+                    'Choosing the right program': "That's why I'm here! We'll find your perfect match! 🎯",
+                    'Balancing studies with current responsibilities': "Balance is key! Our programs are built for working professionals! ⚖️"
+                }
+            },
+            // Section 2: Professional Experience (Questions 9-15)
+            {
+                id: 'q9_employment_status',
+                number: 9,
+                message: "Now let's talk about your professional journey! 💼 What's your current employment status?",
+                type: 'quick',
+                options: [
+                    'Employed full-time',
+                    'Employed part-time',
+                    'Self-employed/Freelancing',
+                    'Between jobs/Actively seeking',
+                    'Student',
+                    'Retired but considering new opportunities'
+                ]
+            },
+            {
+                id: 'q10_industry',
+                number: 10,
+                message: "What industry are you in? 🏢 This helps me suggest programs that align with your field!",
+                type: 'quick',
+                options: [
+                    'Healthcare/Medical',
+                    'Business/Finance/Consulting',
+                    'Education/Training',
+                    'Government/Public Service',
+                    'Technology/IT',
+                    'Criminal Justice/Law Enforcement',
+                    'Non-profit/Social Services',
+                    'Other'
+                ]
+            },
+            {
+                id: 'q11_years_experience',
+                number: 11,
+                message: "How many years of professional experience do you have? 📅 Experience is valuable!",
+                type: 'quick',
+                options: [
+                    'Less than 2 years',
+                    '2-5 years',
+                    '5-10 years',
+                    '10-15 years',
+                    '15-20 years',
+                    'More than 20 years'
+                ]
+            },
+            {
+                id: 'q12_role_level',
+                number: 12,
+                message: "What's your current role level? 📊 (No matter where you are, there's always room to grow!)",
+                type: 'quick',
+                options: [
+                    'Individual contributor/Front-line role',
+                    'Senior specialist/Subject matter expert',
+                    'Team leader/Supervisor',
+                    'Manager/Department head',
+                    'Senior manager/Director',
+                    'Executive/C-suite'
+                ]
+            },
+            {
+                id: 'q13_engaging_aspects',
+                number: 13,
+                message: "What parts of your work light you up? ✨ Choose up to 3 that really energize you!",
+                type: 'checkbox',
+                options: [
+                    'Problem-solving and analytical challenges',
+                    'Leading and developing team members',
+                    'Client/customer interaction and service',
+                    'Strategic planning and big-picture thinking',
+                    'Hands-on technical work',
+                    'Creative and innovative projects',
+                    'Training and knowledge sharing',
+                    'Process improvement and efficiency'
+                ],
+                maxSelections: 3
+            },
+            {
+                id: 'q14_frustration',
+                number: 14,
+                message: "Let's be real - what's your biggest frustration at work right now? 😤 (Education can fix this!)",
+                type: 'quick',
+                options: [
+                    'Limited advancement opportunities',
+                    'Lack of recognition for my contributions',
+                    'Feeling stuck in routine tasks',
+                    'Insufficient compensation for my skills',
+                    'Need more credibility and credentials',
+                    'Want to transition to a new field'
+                ],
+                followUp: {
+                    'Limited advancement opportunities': "Time to break through that ceiling! 🚀",
+                    'Lack of recognition for my contributions': "Let's get you the credentials that demand recognition! 🏆",
+                    'Feeling stuck in routine tasks': "Ready to level up to more exciting challenges! 🎮",
+                    'Insufficient compensation for my skills': "Education is the best investment in your earning power! 💰",
+                    'Need more credibility and credentials': "Perfect! That's exactly what we're here for! 📜",
+                    'Want to transition to a new field': "Career pivots are my specialty! Let's make it happen! 🔄"
+                }
+            },
+            {
+                id: 'q15_ideal_role',
+                number: 15,
+                message: "Dream big! 🌟 If you could wave a magic wand and be in your ideal role 3 years from now, what would you be doing?",
+                type: 'text',
+                placeholder: 'Tell me about your dream job...'
+            },
+            // Section 3: Career Vision (Questions 16-21)
+            {
+                id: 'q16_primary_goal',
+                number: 16,
+                message: "Let's talk goals! 🎯 What's your primary career goal for the next 3-5 years?",
+                type: 'quick',
+                options: [
+                    'Advance to leadership/management role',
+                    'Become a recognized expert in my field',
+                    'Transition to a new industry or career',
+                    'Start my own business or practice',
+                    'Increase my earning potential significantly',
+                    'Find more meaningful and fulfilling work'
+                ]
+            },
+            {
+                id: 'q17_motivation',
+                number: 17,
+                message: "What's lighting a fire under you right now? 🔥 Select all that apply!",
+                type: 'checkbox',
+                options: [
+                    'Career advancement opportunity',
+                    'Job market changes in my industry',
+                    'Personal goal I\'ve been putting off',
+                    'Employer encouragement or requirement',
+                    'Desire for more job security',
+                    'Life transition (career change, empty nest, etc.)',
+                    'Want to set example for family/others'
+                ]
+            },
+            {
+                id: 'q18_current_vs_new',
+                number: 18,
+                message: "On a scale of 1-5, how important is it that your education relates to your current job vs. opening new opportunities?",
+                type: 'scale',
+                scaleMin: 1,
+                scaleMax: 5,
+                scaleLabels: {
+                    1: 'Current Job Focus',
+                    5: 'New Opportunities'
+                }
+            },
+            {
+                id: 'q19_timeline',
+                number: 19,
+                message: "When would you ideally like to complete your program? ⏰ (Fun fact: Students who start sooner reach their goals 40% faster!)",
+                type: 'quick',
+                options: [
+                    'As quickly as possible (under 1 year)',
+                    '1-2 years',
+                    '2-3 years',
+                    '3-4 years',
+                    'I\'m flexible on timing'
+                ]
+            },
+            {
+                id: 'q20_ten_year_vision',
+                number: 20,
+                message: "Think big picture - where do you see yourself in 10 years? 🔮 (Dream big!)",
+                type: 'quick',
+                options: [
+                    'Senior executive or business owner',
+                    'Recognized expert/thought leader in my field',
+                    'Educator/trainer/mentor to others',
+                    'Consultant or independent professional',
+                    'Community leader making social impact',
+                    'Still exploring - want to keep options open'
+                ]
+            },
+            {
+                id: 'q21_success_definition',
+                number: 21,
+                message: "What would make you feel most successful in your career? 🏆 (There's no wrong answer!)",
+                type: 'quick',
+                options: [
+                    'Recognition as a leader in my field',
+                    'Financial security and independence',
+                    'Making a positive impact on others',
+                    'Intellectual challenge and continuous learning',
+                    'Work-life balance and flexibility',
+                    'Building something lasting and meaningful'
+                ]
+            },
+            // Section 4: Decision Process (Questions 22-24)
+            {
+                id: 'q22_decision_factors',
+                number: 22,
+                message: "When choosing a program, what matters most to you? 🤔 Pick your top 3!",
+                type: 'checkbox',
+                options: [
+                    'Reputation and credibility of the institution',
+                    'Flexibility to balance with current responsibilities',
+                    'Support and resources available to students',
+                    'Career services and job placement assistance',
+                    'Cost and return on investment',
+                    'Program format (online, hybrid, in-person)',
+                    'Faculty expertise and industry connections',
+                    'Accelerated timeline to completion'
+                ],
+                maxSelections: 3
+            },
+            {
+                id: 'q23_decision_makers',
+                number: 23,
+                message: "Who else would be part of this decision? 👥 (We can help you make the case!)",
+                type: 'quick',
+                options: [
+                    'This is entirely my decision',
+                    'My spouse/partner',
+                    'My employer or manager',
+                    'Family members',
+                    'Professional mentor or advisor',
+                    'Financial advisor'
+                ]
+            },
+            {
+                id: 'q24_confidence_needs',
+                number: 24,
+                message: "Last question before the fun one! 🎉 What would help you feel confident moving forward? (Select all)",
+                type: 'checkbox',
+                options: [
+                    'Clear understanding of time commitment',
+                    'Confidence in my ability to succeed',
+                    'Proof of career advancement outcomes',
+                    'Financial plan that works for my situation',
+                    'Support from employer/family',
+                    'Detailed program curriculum and requirements',
+                    'Opportunity to speak with current students/graduates'
+                ]
+            },
+            // Section 5: Final Personalization (Question 25)
+            {
+                id: 'q25_final_thoughts',
+                number: 25,
+                message: "Final question! 🌟 What's the most important thing you'd want me to know about your situation? (This helps me personalize your blueprint!)",
+                type: 'text',
+                placeholder: 'Share anything that would help us understand your unique situation...'
+            }
+        ];
+
+        // Initialize the quiz
+        async function initializeQuiz() {
+            const urlParams = new URLSearchParams(window.location.search);
+            appState.userEmail = urlParams.get('email') || '';
+            appState.userName = urlParams.get('name') || '';
+            appState.quizStartTime = new Date();
+            
+            // Initialize LLM service if API key is configured
+            if (window.quizConfig && window.quizConfig.claude.apiKey && window.quizConfig.claude.apiKey.startsWith('sk-ant-')) {
+                try {
+                    appState.llmService = new LLMService(window.quizConfig.claude.apiKey);
+                    await appState.llmService.initializeConversation();
+                    console.log('✅ Claude LLM service initialized');
+                } catch (error) {
+                    console.error('Failed to initialize Claude service:', error);
+                    console.log('Falling back to static quiz');
+                }
+            }
+            
+            // Start with first question
+            setTimeout(() => {
+                askQuestion(0);
+            }, 1000);
+        }
+
+        // Ask a question
+        function askQuestion(index) {
+            if (index >= quizQuestions.length) {
+                completeQuiz();
+                return;
+            }
+            
+            const question = quizQuestions[index];
+            appState.currentQuestion = index;
+            
+            // Update progress if not intro
+            if (index > 0) {
+                updateProgress();
+            }
+            
+            // Check for smart skip logic
+            if (shouldSkipQuestion(question, index)) {
+                askQuestion(index + 1);
+                return;
+            }
+            
+            // Use dynamic message if available
+            const messageToShow = (question.dynamicMessage && 
+                typeof question.dynamicMessage === 'function') ? 
+                question.dynamicMessage(appState.responses) || question.message : 
+                question.message;
+            
+            // Add bot message
+            addBotMessage(messageToShow);
+            
+            // Show appropriate input after delay
+            setTimeout(() => {
+                if (question.type === 'quick') {
+                    showQuickReplies(question.options);
+                } else if (question.type === 'text') {
+                    showTextInput(question.placeholder);
+                } else if (question.type === 'checkbox') {
+                    showCheckboxOptions(question.options, question.maxSelections);
+                } else if (question.type === 'scale') {
+                    showScaleInput(question);
+                }
+            }, 1500);
+        }
+
+        // Add bot message
+        function addBotMessage(text, isSpecial = false) {
+            appState.isTyping = true;
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing-message';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-bubble">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            elements.chatMessages.appendChild(typingDiv);
+            
+            // Add actual message after delay
+            const typingTime = Math.min(text.length * 20, 2000);
+            setTimeout(() => {
+                typingDiv.remove();
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message bot ${isSpecial ? 'special' : ''}`;
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-bubble">${text}</div>
+                `;
+                elements.chatMessages.appendChild(messageDiv);
+                
+                appState.isTyping = false;
+            }, 1000 + Math.random() * 1000);
+        }
+
+        // Add user message
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">👤</div>
+                <div class="message-bubble">${text}</div>
+            `;
+            elements.chatMessages.appendChild(messageDiv);
+        }
+
+        // Show quick reply buttons with enhanced card design
+        function showQuickReplies(options) {
+            elements.quickReplies.innerHTML = '';
+            elements.quickReplies.classList.remove('hidden');
+            
+            // Create grid container
+            const grid = document.createElement('div');
+            grid.className = 'quick-replies-grid';
+            
+            options.forEach((option, index) => {
+                const card = document.createElement('div');
+                card.className = 'quick-reply-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const span = document.createElement('span');
+                span.textContent = option;
+                card.appendChild(span);
+                
+                card.onclick = () => handleQuickReply(option);
+                grid.appendChild(card);
+            });
+            
+            elements.quickReplies.appendChild(grid);
+        }
+
+        // Hide quick replies
+        function hideQuickReplies() {
+            elements.quickReplies.classList.add('hidden');
+            elements.quickReplies.innerHTML = '';
+        }
+
+        // Show text input
+        function showTextInput(placeholder = 'Type your answer...') {
+            elements.inputArea.classList.remove('hidden');
+            elements.chatInput.placeholder = placeholder;
+            elements.chatInput.value = '';
+            elements.chatInput.focus();
+        }
+
+        // Hide text input
+        function hideTextInput() {
+            elements.inputArea.classList.add('hidden');
+        }
+        
+        // Show checkbox options
+        function showCheckboxOptions(options, maxSelections = 3) {
+            elements.quickReplies.innerHTML = '';
+            elements.quickReplies.classList.remove('hidden');
+            
+            const container = document.createElement('div');
+            container.className = 'checkbox-container';
+            
+            const selectedOptions = [];
+            
+            options.forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'checkbox-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = option;
+                checkbox.id = `checkbox-${index}`;
+                
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        if (selectedOptions.length >= maxSelections) {
+                            e.target.checked = false;
+                            return;
+                        }
+                        selectedOptions.push(option);
+                        label.classList.add('selected');
+                    } else {
+                        const idx = selectedOptions.indexOf(option);
+                        if (idx > -1) selectedOptions.splice(idx, 1);
+                        label.classList.remove('selected');
+                    }
+                    
+                    // Enable/disable submit button
+                    const submitBtn = container.querySelector('.checkbox-submit-btn');
+                    if (submitBtn) {
+                        submitBtn.disabled = selectedOptions.length === 0;
+                    }
+                });
+                
+                const text = document.createElement('span');
+                text.textContent = option;
+                
+                label.appendChild(checkbox);
+                label.appendChild(text);
+                container.appendChild(label);
+            });
+            
+            // Add submit button
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'checkbox-submit-btn';
+            submitBtn.textContent = `Continue (Select up to ${maxSelections})`;
+            submitBtn.disabled = true;
+            submitBtn.onclick = () => handleCheckboxSubmit(selectedOptions);
+            container.appendChild(submitBtn);
+            
+            elements.quickReplies.appendChild(container);
+        }
+        
+        // Handle checkbox submission
+        function handleCheckboxSubmit(selectedOptions) {
+            if (appState.isTyping || selectedOptions.length === 0) return;
+            
+            addUserMessage(selectedOptions.join(', '));
+            hideQuickReplies();
+            
+            // Save response
+            const question = quizQuestions[appState.currentQuestion];
+            appState.responses[question.id] = selectedOptions;
+            
+            // Check for milestones and proceed to next question
+            const hasMilestone = checkMilestones();
+            const milestoneDelay = hasMilestone ? 2500 : 0;
+            
+            setTimeout(() => {
+                askQuestion(appState.currentQuestion + 1);
+            }, 1000 + milestoneDelay);
+        }
+        
+        // Show emoji scale input
+        function showScaleInput(question) {
+            elements.quickReplies.innerHTML = '';
+            elements.quickReplies.classList.remove('hidden');
+            
+            const container = document.createElement('div');
+            container.className = 'emoji-scale-container';
+            container.style.animation = 'slideInUp 0.4s ease';
+            
+            // Question reminder
+            const reminder = document.createElement('p');
+            reminder.style.textAlign = 'center';
+            reminder.style.marginBottom = '20px';
+            reminder.style.color = '#666';
+            reminder.textContent = 'Click to select your preference:';
+            container.appendChild(reminder);
+            
+            // Emoji scale
+            const emojiScale = document.createElement('div');
+            emojiScale.className = 'emoji-scale';
+            
+            const emojis = [
+                { emoji: '😟', label: question.scaleLabels[1] || 'Strongly Disagree', value: 1 },
+                { emoji: '😕', label: 'Disagree', value: 2 },
+                { emoji: '😐', label: 'Neutral', value: 3 },
+                { emoji: '🙂', label: 'Agree', value: 4 },
+                { emoji: '😊', label: question.scaleLabels[5] || 'Strongly Agree', value: 5 }
+            ];
+            
+            let selectedValue = null;
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'scale-submit-btn';
+            submitBtn.textContent = 'Select an option to continue';
+            submitBtn.disabled = true;
+            submitBtn.style.marginTop = '20px';
+            submitBtn.style.opacity = '0.5';
+            
+            emojis.forEach((item, index) => {
+                const emojiWrapper = document.createElement('div');
+                emojiWrapper.style.textAlign = 'center';
+                emojiWrapper.style.cursor = 'pointer';
+                
+                const emojiOption = document.createElement('div');
+                emojiOption.className = 'emoji-option';
+                emojiOption.textContent = item.emoji;
+                emojiOption.style.animationDelay = `${index * 0.1}s`;
+                emojiOption.style.animation = 'slideInUp 0.4s ease both';
+                
+                const label = document.createElement('div');
+                label.className = 'emoji-label';
+                label.textContent = item.label;
+                
+                emojiOption.onclick = () => {
+                    // Clear previous selection
+                    document.querySelectorAll('.emoji-option').forEach(e => {
+                        e.classList.remove('selected');
+                    });
+                    
+                    // Set new selection
+                    emojiOption.classList.add('selected');
+                    selectedValue = item.value;
+                    
+                    // Enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.textContent = 'Continue';
+                    submitBtn.onclick = () => handleScaleSubmit(selectedValue);
+                };
+                
+                emojiWrapper.appendChild(emojiOption);
+                emojiWrapper.appendChild(label);
+                emojiScale.appendChild(emojiWrapper);
+            });
+            
+            container.appendChild(emojiScale);
+            container.appendChild(submitBtn);
+            
+            elements.quickReplies.appendChild(container);
+        }
+        
+        // Handle scale submission
+        function handleScaleSubmit(value) {
+            if (appState.isTyping) return;
+            
+            addUserMessage(`${value} out of 5`);
+            hideQuickReplies();
+            
+            // Save response
+            const question = quizQuestions[appState.currentQuestion];
+            appState.responses[question.id] = value;
+            
+            // Check for milestones and proceed to next question
+            const hasMilestone = checkMilestones();
+            const milestoneDelay = hasMilestone ? 2500 : 0;
+            
+            setTimeout(() => {
+                askQuestion(appState.currentQuestion + 1);
+            }, 1000 + milestoneDelay);
+        }
+        
+        // Smart skip logic
+        function shouldSkipQuestion(question, index) {
+            // Skip Question 2 (field of study) if education level is high school
+            if (question.id === 'q2_field_of_study' && 
+                appState.responses['q1_education_level'] === 'High School Diploma or GED') {
+                return true;
+            }
+            
+            // Skip Question 3 (graduation date) if education level is high school
+            if (question.id === 'q3_completion_date' && 
+                appState.responses['q1_education_level'] === 'High School Diploma or GED') {
+                return true;
+            }
+            
+            // Skip Q8 (returning to school concern) if currently enrolled
+            if (question.id === 'q8_biggest_concern' && 
+                appState.responses['q3_completion_date'] === 'Currently enrolled') {
+                return true;
+            }
+            
+            // Skip work-related questions (Q10-Q14) if unemployed/student without work
+            const unemployed = ['Between jobs/Actively seeking', 'Student'];
+            const workQuestions = ['q10_industry', 'q11_years_experience', 'q12_role_level', 'q13_engaging_aspects', 'q14_biggest_frustration'];
+            if (workQuestions.includes(question.id) && 
+                unemployed.includes(appState.responses['q9_employment_status'])) {
+                return true;
+            }
+            
+            // Skip Q15 (ideal role in 3 years) if retired
+            if (question.id === 'q15_ideal_role' && 
+                appState.responses['q9_employment_status'] === 'Retired but considering new opportunities') {
+                // Don't skip, but the question should be phrased differently
+                return false;
+            }
+            
+            return false;
+        }
+        
+        // Show celebration message
+        function showCelebration(message) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration-message';
+            celebration.innerHTML = `
+                <h2>${message}</h2>
+                <p>You're doing amazing! Keep going!</p>
+            `;
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                celebration.remove();
+            }, 2500);
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#d9ed92', '#76c893', '#52a373', '#1a759f'];
+            const confettiCount = 30;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.top = '-10px';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+        
+        // Show micro reward
+        function showMicroReward() {
+            const rewards = ['🌟', '💪', '🎯', '🏆', '✨'];
+            const reward = rewards[Math.floor(Math.random() * rewards.length)];
+            
+            const badge = document.createElement('div');
+            badge.className = 'reward-badge';
+            badge.textContent = reward;
+            badge.style.fontSize = '40px';
+            document.body.appendChild(badge);
+            
+            setTimeout(() => badge.remove(), 1000);
+        }
+        
+        // Simplified milestone check for backward compatibility
+        function checkMilestones() {
+            // Milestones are now handled in updateProgress
+            return false;
+        }
+
+        // Handle quick reply
+        async function handleQuickReply(option) {
+            if (appState.isTyping) return;
+            
+            addUserMessage(option);
+            hideQuickReplies();
+            
+            // Save response
+            const question = quizQuestions[appState.currentQuestion];
+            appState.responses[question.id] = option;
+            
+            // Update conversation context for LLM
+            if (appState.llmService) {
+                appState.conversationContext[question.id] = {
+                    question: question.message,
+                    response: option,
+                    timestamp: new Date().toISOString()
+                };
+            }
+            
+            // Handle intro special case
+            if (appState.currentQuestion === 0) {
+                if (option.includes('Tell me more')) {
+                    addBotMessage("Salem University has been transforming lives for over 130 years! 🎓 We've helped 20,000+ students achieve their career goals with flexible online programs and free weekly tutoring. Ready to join them?");
+                    setTimeout(() => {
+                        showQuickReplies(['Yes, I\'m ready! 🚀', 'Let\'s do this! 💪']);
+                    }, 2000);
+                    return;
+                } else {
+                    elements.progressContainer.classList.remove('hidden');
+                }
+            }
+            
+            // Handle 'Other' option that needs text input
+            if (option === 'Other' && question.id === 'q2_field_of_study') {
+                setTimeout(() => {
+                    addBotMessage("I'm curious! What did you study? Sometimes the most interesting careers come from unique backgrounds... 🎓", false, () => {
+                        showTextInput('Enter your field of study...');
+                    });
+                }, 500);
+                return;
+            }
+            
+            // Add micro-rewards for engagement
+            const answeredQuestions = Object.keys(appState.responses).filter(key => 
+                key.startsWith('q') && appState.responses[key]
+            ).length;
+            
+            if (answeredQuestions % 5 === 0 && answeredQuestions > 0) {
+                showMicroReward();
+            }
+            
+            // Show follow-up if exists
+            if (question.followUp && question.followUp[option]) {
+                setTimeout(() => {
+                    addBotMessage(question.followUp[option], true);
+                }, 500);
+            } else if (appState.llmService && window.quizConfig.features.intelligentFollowups) {
+                // Generate dynamic follow-up for questions without static follow-ups
+                try {
+                    appState.apiCallCount++;
+                    const dynamicFollowup = await appState.llmService.generateFollowUpQuestion(
+                        question.message,
+                        option,
+                        appState.conversationContext
+                    );
+                    
+                    if (dynamicFollowup) {
+                        setTimeout(() => {
+                            addBotMessage(dynamicFollowup, true);
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error('Failed to generate dynamic follow-up:', error);
+                }
+            }
+            
+            // Check for milestones and proceed to next question
+            const hasMilestone = checkMilestones();
+            const followUpDelay = question.followUp && question.followUp[option] ? 3500 : 1500;
+            const milestoneDelay = hasMilestone ? 2500 : 0;
+            
+            setTimeout(() => {
+                askQuestion(appState.currentQuestion + 1);
+            }, followUpDelay + milestoneDelay);
+        }
+
+        // Handle text input
+        async function handleTextSubmit() {
+            const text = elements.chatInput.value.trim();
+            if (!text || appState.isTyping) return;
+            
+            addUserMessage(text);
+            hideTextInput();
+            
+            // Save response
+            const question = quizQuestions[appState.currentQuestion];
+            appState.responses[question.id] = text;
+            
+            // Save name specifically
+            if (question.id === 'name') {
+                appState.userName = text;
+            }
+            
+            // LLM Analysis for open-text responses
+            if (appState.llmService && window.quizConfig.features.nlpAnalysis && 
+                (question.id === 'q15_ideal_role' || question.id === 'q25_final_thoughts')) {
+                try {
+                    appState.apiCallCount++;
+                    const analysis = await appState.llmService.analyzeTextResponse(
+                        question.message,
+                        text,
+                        appState.conversationContext
+                    );
+                    
+                    // Store analysis for blueprint generation
+                    appState.conversationContext[question.id] = analysis;
+                    
+                    // Show AI-generated follow-up if needed
+                    if (analysis.followUpNeeded && analysis.suggestedProbe) {
+                        setTimeout(() => {
+                            addBotMessage(analysis.suggestedProbe, true);
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error('LLM analysis failed:', error);
+                }
+            }
+            
+            // Check for milestones and proceed to next question
+            const hasMilestone = checkMilestones();
+            const milestoneDelay = hasMilestone ? 2500 : 0;
+            
+            setTimeout(() => {
+                askQuestion(appState.currentQuestion + 1);
+            }, 1000 + milestoneDelay);
+        }
+
+        // Update progress with visual sections
+        function updateProgress() {
+            const totalQuestions = 25;
+            const answeredQuestions = Object.keys(appState.responses).filter(key => 
+                key.startsWith('q') && appState.responses[key]
+            ).length;
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            
+            // Update progress line
+            elements.progressFill.style.width = `${progress}%`;
+            elements.progressPercent.textContent = `${Math.round(progress)}%`;
+            
+            // Update time estimate
+            const remainingQuestions = totalQuestions - answeredQuestions;
+            const estimatedMinutes = Math.ceil(remainingQuestions * 0.5);
+            const timeEstimate = document.getElementById('timeEstimate');
+            if (timeEstimate) {
+                timeEstimate.textContent = 
+                    estimatedMinutes > 0 ? `~${estimatedMinutes} min remaining` : 'Almost done!';
+            }
+            
+            // Update section indicators
+            updateSectionProgress(answeredQuestions);
+            
+            // Check for milestone celebrations
+            checkMilestoneCelebration(answeredQuestions, progress);
+        }
+        
+        // Update section dots based on progress
+        function updateSectionProgress(answeredQuestions) {
+            const sections = [
+                { id: 'section1', range: [0, 8], label: 'Education' },
+                { id: 'section2', range: [8, 15], label: 'Experience' },
+                { id: 'section3', range: [15, 21], label: 'Vision' },
+                { id: 'section4', range: [21, 24], label: 'Decision' },
+                { id: 'section5', range: [24, 25], label: 'Finish' }
+            ];
+            
+            sections.forEach((section, index) => {
+                const dot = document.getElementById(section.id);
+                if (!dot) return;
+                
+                const label = dot.parentElement.querySelector('.section-label');
+                
+                if (answeredQuestions > section.range[1]) {
+                    // Section completed
+                    dot.classList.remove('active');
+                    dot.classList.add('completed');
+                    dot.innerHTML = '✓';
+                    label.classList.remove('active');
+                } else if (answeredQuestions >= section.range[0]) {
+                    // Section active
+                    dot.classList.add('active');
+                    dot.classList.remove('completed');
+                    dot.innerHTML = (index + 1).toString();
+                    label.classList.add('active');
+                } else {
+                    // Section pending
+                    dot.classList.remove('active', 'completed');
+                    dot.innerHTML = (index + 1).toString();
+                    label.classList.remove('active');
+                }
+            });
+        }
+        
+        // Milestone celebrations
+        function checkMilestoneCelebration(answeredQuestions, progress) {
+            const milestones = [
+                { questions: 6, message: '🎆 Great start!', celebrated: false },
+                { questions: 13, message: '🎉 Halfway there!', celebrated: false },
+                { questions: 19, message: '🚀 Almost finished!', celebrated: false }
+            ];
+            
+            milestones.forEach(milestone => {
+                if (answeredQuestions === milestone.questions && !appState.milestones[milestone.questions]) {
+                    appState.milestones[milestone.questions] = true;
+                    showCelebration(milestone.message);
+                    createConfetti();
+                }
+            });
+        }
+
+        // Complete quiz
+        async function completeQuiz() {
+            addBotMessage("Perfect! 🎉 I have everything I need to create your personalized career blueprint. This will show you exciting 3, 5, and 10-year career projections tailored just for you...", true);
+            
+            // Log completion stats
+            appState.quizEndTime = new Date();
+            const completionTime = Math.round((appState.quizEndTime - appState.quizStartTime) / 1000);
+            console.log('Quiz completed in', completionTime, 'seconds');
+            console.log('API calls made:', appState.apiCallCount);
+            
+            setTimeout(() => {
+                showLoadingScreen();
+                setTimeout(async () => {
+                    await generateBlueprint();
+                }, 3000);
+            }, 2000);
+        }
+
+        // Show loading screen
+        function showLoadingScreen(message = 'Analyzing your responses...') {
+            elements.loadingScreen.style.display = 'flex';
+            const loadingText = elements.loadingScreen.querySelector('p');
+            if (loadingText) {
+                loadingText.textContent = message;
+            }
+        }
+
+        // Hide loading screen
+        function hideLoadingScreen() {
+            elements.loadingScreen.style.display = 'none';
+        }
+        
+        // Render AI-generated blueprint
+        function renderAIBlueprint(blueprint) {
+            const blueprintHTML = `
+                <div class="blueprint-header">
+                    <h2>${blueprint.personalizedIntro.greeting}</h2>
+                    <p>${blueprint.personalizedIntro.acknowledgment}</p>
+                </div>
+                
+                <div class="career-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">3 YEAR VISION</div>
+                        <div class="timeline-role">${blueprint.careerTrajectory.threeYear.role}</div>
+                        <p>${blueprint.careerTrajectory.threeYear.description}</p>
+                        <div class="timeline-skills">
+                            ${blueprint.careerTrajectory.threeYear.skills.map(skill => 
+                                `<span class="skill-badge">${skill}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">5 YEAR VISION</div>
+                        <div class="timeline-role">${blueprint.careerTrajectory.fiveYear.role}</div>
+                        <p>${blueprint.careerTrajectory.fiveYear.description}</p>
+                        <div class="timeline-skills">
+                            ${blueprint.careerTrajectory.fiveYear.skills.map(skill => 
+                                `<span class="skill-badge">${skill}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">10 YEAR VISION</div>
+                        <div class="timeline-role">${blueprint.careerTrajectory.tenYear.role}</div>
+                        <p>${blueprint.careerTrajectory.tenYear.description}</p>
+                        <div class="timeline-skills">
+                            ${blueprint.careerTrajectory.tenYear.achievements.map(achievement => 
+                                `<span class="skill-badge">${achievement}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recommended-programs">
+                    <h3>Your Recommended Salem Program</h3>
+                    <div class="program-card">
+                        <h4>${blueprint.recommendedPrograms.primary.name}</h4>
+                        <p>${blueprint.recommendedPrograms.primary.rationale}</p>
+                        <ul>
+                            ${blueprint.recommendedPrograms.primary.keyBenefits.map(benefit => 
+                                `<li>${benefit}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="skill-roadmap">
+                    <h3>Your Skill Development Roadmap</h3>
+                    <div class="roadmap-section">
+                        <h4>Build on Your Strengths</h4>
+                        <p>${blueprint.skillRoadmap.strengths.join(', ')}</p>
+                    </div>
+                    <div class="roadmap-section">
+                        <h4>Skills to Develop</h4>
+                        <p>${blueprint.skillRoadmap.toDevlop.join(', ')}</p>
+                    </div>
+                </div>
+                
+                <div class="overcoming-challenges">
+                    <h3>Addressing Your Concerns</h3>
+                    ${blueprint.challengeSolutions.map(solution => `
+                        <div class="challenge-item">
+                            <h4>${solution.concern}</h4>
+                            <p>${solution.solution}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="cta-section">
+                    <h3>Ready to Start Your Journey?</h3>
+                    <p>${blueprint.nextSteps.callToAction}</p>
+                    <button class="apply-button" onclick="applyNow()">
+                        Apply Now & Transform Your Future
+                    </button>
+                    <p class="urgency-text">${blueprint.nextSteps.urgency}</p>
+                </div>
+            `;
+            
+            elements.blueprintContent.innerHTML = blueprintHTML;
+        }
+
+        // Generate blueprint
+        function generateBlueprint() {
+            hideLoadingScreen();
+            elements.chatInterface.style.display = 'none';
+            elements.blueprintView.classList.remove('hidden');
+            elements.blueprintView.style.display = 'block';
+            
+            const blueprintHTML = `
+                <div class="blueprint-header">
+                    <h2>Your Personalized Career Blueprint</h2>
+                    <p>Prepared for ${appState.userName || 'Future Salem Graduate'}</p>
+                </div>
+                
+                <div class="career-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">3 YEAR OUTLOOK</div>
+                        <div class="timeline-role">Senior Specialist</div>
+                        <p>Advance your expertise with specialized credentials</p>
+                        <div class="timeline-skills">
+                            <span class="skill-badge">Leadership</span>
+                            <span class="skill-badge">Strategic Planning</span>
+                            <span class="skill-badge">Industry Expertise</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">5 YEAR OUTLOOK</div>
+                        <div class="timeline-role">Management Leader</div>
+                        <p>Lead teams and drive organizational success</p>
+                        <div class="timeline-skills">
+                            <span class="skill-badge">Team Management</span>
+                            <span class="skill-badge">Budget Control</span>
+                            <span class="skill-badge">Innovation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">10 YEAR OUTLOOK</div>
+                        <div class="timeline-role">Executive Director</div>
+                        <p>Shape strategy at the highest levels</p>
+                        <div class="timeline-skills">
+                            <span class="skill-badge">Executive Leadership</span>
+                            <span class="skill-badge">Business Strategy</span>
+                            <span class="skill-badge">Industry Influence</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <h3>Ready to Start Your Journey?</h3>
+                    <p>Join 20,000+ successful Salem graduates</p>
+                    <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+                        <li>✓ Application fee waived (Save $75)</li>
+                        <li>✓ Free weekly tutoring included</li>
+                        <li>✓ 100% online flexibility</li>
+                        <li>✓ Start dates every 8 weeks</li>
+                    </ul>
+                    <button class="apply-button" onclick="startApplication()">
+                        Start My Application Now →
+                    </button>
+                    <p style="margin-top: 16px; color: var(--verdigris);">
+                        🔥 Special offer expires in 48 hours
+                    </p>
+                </div>
+            `;
+            
+            elements.blueprintView.innerHTML = blueprintHTML;
+        }
+
+        // Start application
+        function startApplication() {
+            console.log('Application started:', appState.responses);
+            window.location.href = `https://apply.salem.edu?email=${encodeURIComponent(appState.userEmail)}&source=career-quiz`;
+        }
+
+        // Utility functions
+        function scrollToBottom() {
+            // Deprecated - no scrolling in single-screen design
+        }
+
+        // Event listeners
+        elements.sendButton.addEventListener('click', handleTextSubmit);
+        elements.chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleTextSubmit();
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeQuiz);
+    </script>
+</body>
+</html>
