@@ -6,9 +6,10 @@ class LLMService {
     constructor(apiKey) {
         this.apiKey = apiKey;
         // Use Vercel endpoint if available, otherwise direct API
-        this.apiUrl = window.location.hostname.includes('vercel.app') || window.location.hostname !== 'localhost' 
-            ? '/api/claude' 
-            : 'https://api.anthropic.com/v1/messages';
+        // Always use the API endpoint when deployed
+  this.apiUrl = window.location.hostname === 'localhost' || window.location.hostname === ''
+      ? 'https://api.anthropic.com/v1/messages'
+      : '/api/claude';
         this.model = 'claude-3-sonnet-20240229'; // Best balance of quality and cost
         this.conversationHistory = [];
         this.userProfile = {};
