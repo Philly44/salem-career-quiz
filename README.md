@@ -53,4 +53,4 @@ Approximately $0.03-0.05 per quiz completion with Claude Sonnet
 
 ## License
 
-Copyright Salem University 2024
+Copyright Salem University 2024 
